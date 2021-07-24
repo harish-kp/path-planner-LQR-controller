@@ -3,7 +3,7 @@
 Status : Active
 
 # Prerequisites
-ROS Melodic, Ubuntu 18.04, Turtlebot3 packages  and 
+ROS Melodic, Ubuntu 18.04, Turtlebot3 packages
 
 
 # Brief Intro
