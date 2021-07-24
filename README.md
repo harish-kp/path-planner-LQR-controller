@@ -1,5 +1,7 @@
 # path-planner-LQR-controller
 
+Status : Active
+
 # Prerequisites
 ROS Melodic, Ubuntu 18.04, Turtlebot3 packages (https://emanual.robotis.com/docs/en/platform/turtlebot3/simulation/#gazebo-simulation and 
 https://github.com/ROBOTIS-GIT/turtlebot3_msgs)
