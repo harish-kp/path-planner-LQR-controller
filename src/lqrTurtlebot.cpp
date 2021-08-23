@@ -1,4 +1,4 @@
-#include "ros.h"
+#include  "ros/ros.h"
 #include "stdio.h"
 class lqrController{
     public:
@@ -34,8 +34,12 @@ class lqrController{
 }
 int main {
     int T = 150; num_steps = 15000; n = 3; m = 2;p = 3;   
+    float A[3][3] = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}; C[3][3]= {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}};
+    float B[3][2] = {{1,0}, {1,0}, {0,1}}; R[2][2]={{1,0}, {0,1}}; 
+    float Q[3][3] = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}};
     robot = lqrController();
     for (int i = 0; i < num_steps; i++){
         robot.lqrLoop()
     } 
+    ros::spinOnce();
 }
