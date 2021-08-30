@@ -5,15 +5,25 @@
 #include "iostream"
 #include "vector"
 
-// class lqrController{
-//     public:
+class lqrController{
+    private:
+    ros::Publisher vel_pub;
+    ros::Subscriber odom_sub;
+    geometry_msgs::Twist msg;
 
-    // std::cout << "Create LQR Controller node";
-    // std::cout << "..........................";
-    // ros::init(argc, argv, "lqrController");
-    // ros::NodeHandle n;
-    // ros::Publisher vel_pub;
-    // vel_pub = nh.advertise<Twist>("/cmd_vel", 10);
+    public:
+
+    
+    lqrController(ros::NodeHandle *nh){
+    
+    vel_pub = nh->advertise<geometry_msgs::Twist>("/cmd_vel", 10);
+    }
+    int lqrLoop(){
+       msg.linear.x = 0.5;
+       vel_pub.publish(msg);}
+       
+    };
+    
 //     ros::Subscriber odom_sub;
 //     odom_sub = nh.subscribe<Odometry>("/odom", 10, odom_callback);
 //     odom_msg = Odometry();
@@ -31,11 +41,7 @@
 //     void odom_msg{
 
 //     }
-//     int lqrLoop{
-
-//     }
-
-
+    
 // }
 // int ref_traj_gen{
 
@@ -48,18 +54,12 @@ int main (int argc, char** argv){
     ROS_INFO_STREAM ("Create LQR Controller node");
     ROS_INFO_STREAM ("..........................");
     ros::init(argc, argv, "lqrController");
-    
     ros::NodeHandle nh;
-    ros::Publisher vel_pub;
-    vel_pub = nh.advertise<geometry_msgs::Twist>("/cmd_vel", 10);
-    ros::Subscriber odom_sub;
-    geometry_msgs::Twist msg;
-    // robot = lqrController();
+    
+    lqrController robot = lqrController(&nh);
     while (ros::ok()){
     for (int i = 0; i < num_steps; i++){
-        // robot.lqrLoop()
-        msg.linear.x = 0.5;
-        vel_pub.publish(msg);        
+        robot.lqrLoop();        
     } 
     ros::spinOnce();
     }
