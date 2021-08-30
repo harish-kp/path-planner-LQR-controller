@@ -1,45 +1,67 @@
-#include  "ros/ros.h"
-#include "stdio.h"
-class lqrController{
-    public:
+#include  <ros/ros.h>
+#include <geometry_msgs/Twist.h>
+// #include <sensor_msgs>
 
-    std::cout << "Create LQR Controller node";
-    std::cout << "..........................";
-    ros::init(argc, argv, "lqrController");
-    ros::NodeHandle n;
-    ros::Publisher vel_pub;
-    vel_pub = nh.advertise<Twist>("/cmd_vel", 10);
-    ros::Subscriber odom_sub;
-    odom_sub = nh.subscribe<Odometry>("/odom", 10, odom_callback);
-    odom_msg = Odometry();
-    pose_msg = Pose();
-    vel_msg = Twist();
-    bool odom_updated = false;
+#include "iostream"
+#include "vector"
+
+// class lqrController{
+//     public:
+
+    // std::cout << "Create LQR Controller node";
+    // std::cout << "..........................";
+    // ros::init(argc, argv, "lqrController");
+    // ros::NodeHandle n;
+    // ros::Publisher vel_pub;
+    // vel_pub = nh.advertise<Twist>("/cmd_vel", 10);
+//     ros::Subscriber odom_sub;
+//     odom_sub = nh.subscribe<Odometry>("/odom", 10, odom_callback);
+//     odom_msg = Odometry();
+//     pose_msg = Pose();
+//     vel_msg = Twist();
+//     bool odom_updated = false;
 
 
-    void odom_callback(const Odometry &msg)
-    {
-        odom_msg = msg;
-        odom_updated = true; 
-    }  
+//     void odom_callback(const Odometry &msg)
+//     {
+//         odom_msg = msg;
+//         odom_updated = true; 
+//     }  
     
-    void odom_msg{
+//     void odom_msg{
 
-    }
-    int lqrLoop{
+//     }
+//     int lqrLoop{
 
-    }
+//     }
 
 
-}
-int main {
-    int T = 150; num_steps = 15000; n = 3; m = 2;p = 3;   
-    float A[3][3] = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}; C[3][3]= {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}};
-    float B[3][2] = {{1,0}, {1,0}, {0,1}}; R[2][2]={{1,0}, {0,1}}; 
+// }
+// int ref_traj_gen{
+
+// };
+int main (int argc, char** argv){
+    int T = 150; int num_steps = 15; int n = 3; int m = 2;int p = 3;   
+    float A[3][3] = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}; float C[3][3]= {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}};
+    float B[3][2] = {{1,0}, {1,0}, {0,1}}; float R[2][2]={{1,0}, {0,1}}; 
     float Q[3][3] = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}};
-    robot = lqrController();
+    ROS_INFO_STREAM ("Create LQR Controller node");
+    ROS_INFO_STREAM ("..........................");
+    ros::init(argc, argv, "lqrController");
+    
+    ros::NodeHandle nh;
+    ros::Publisher vel_pub;
+    vel_pub = nh.advertise<geometry_msgs::Twist>("/cmd_vel", 10);
+    ros::Subscriber odom_sub;
+    geometry_msgs::Twist msg;
+    // robot = lqrController();
+    while (ros::ok()){
     for (int i = 0; i < num_steps; i++){
-        robot.lqrLoop()
+        // robot.lqrLoop()
+        msg.linear.x = 0.5;
+        vel_pub.publish(msg);        
     } 
     ros::spinOnce();
+    }
+    return 0;
 }
