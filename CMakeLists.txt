@@ -134,7 +134,7 @@ include_directories(include  ${catkin_INCLUDE_DIRS})
 ## The recommended prefix ensures that target names across packages don't collide
 add_executable(${PROJECT_NAME} src/lqrTurtlebot.cpp)
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
-add_dependencies(${PROJECT_NAME} lqr_turtlebot_cpp)
+add_dependencies(${PROJECT_NAME} nav_msgs_generate_messages_cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
