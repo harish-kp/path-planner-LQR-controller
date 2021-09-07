@@ -3,7 +3,6 @@ project(path-planner)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
-
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
@@ -13,6 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   std_msgs
+  eigen_conversions
 )
 
 ## System dependencies are found with CMake's conventions
@@ -118,10 +118,32 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(include  ${catkin_INCLUDE_DIRS})
+find_package(PythonLibs 2.7)
+
+# find_package(Python3 COMPONENTS Interpreter Development)
+# if (${Python3_FOUND})
+#   include_directories(${Python3_INCLUDE_DIRS})
+# else()
+#   message(FATAL_ERROR "Python3 not found, please install it.")
+# endif()
+
+# find_package(NumPy)
+# if (${PYTHON_NUMPY_FOUND})
+#   include_directories(${PYTHON_NUMPY_INCLUDE_DIR})
+# else()
+#   message(WARNING "Python3 NumPy not found, proceeding with -DWITHOUT_NUMPY."
+#   " Some functions might not work.")
+#   add_definitions(-DWITHOUT_NUMPY)
+# endif()
+
+# find_package(matplotlib)
+
+# target_link_libraries(path-planner ${PYTHON_LIBRARIES})
+
 
 ## Declare a C++ library
-# add_library(${PROJECT_NAME} 
-  # src/${PROJECT_NAME}/lqrTurtlebot.cpp
+# add_library(matplotlib 
+#   include/${PROJECT_NAME}/matplotlib/matplotlib.h
 # )
 
 ## Add cmake target dependencies of the library
@@ -132,8 +154,12 @@ include_directories(include  ${catkin_INCLUDE_DIRS})
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
+find_package(Eigen3 REQUIRED)
+# find_package(matplotlib-cpp REQUIRED)
+include_directories(${EIGEN_INCLUDE_DIRS} ${PYTHON_INCLUDE_DIRS})
+add_definitions(${EIGEN_DEFINITIONS})
 add_executable(${PROJECT_NAME} src/lqrTurtlebot.cpp)
-target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${PYTHON_LIBRARIES})
 add_dependencies(${PROJECT_NAME} nav_msgs_generate_messages_cpp)
 
 ## Rename C++ executable without prefix

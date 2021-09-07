@@ -3,11 +3,18 @@
 #include <nav_msgs/Odometry.h>
 #include <tf/transform_broadcaster.h>
 #include<Eigen/Eigen>
-#include<Eigen/Core>
+#include <Eigen/Dense>
+#include <Eigen/Core>
+
+using namespace Eigen;
+#include<vector>
+#include<math.h>
 // #include <sensor_msgs>
-#include <matplotlib.h>
+#include "matplotlib/matplotlibcpp.h"
+// #include "madplotlibcpp.h"
 #include "iostream"
-#include "vector"
+
+
 
 class lqrController{
     private:
@@ -26,8 +33,8 @@ class lqrController{
     lqrController(ros::NodeHandle *nh){
     
     vel_pub = nh->advertise<geometry_msgs::Twist>("/cmd_vel", 10);
-    odom_sub = nh->subscribe<nav_msgs::Odometry>("/odom", 10, odom_callback);
-    odom_msg = nav_msgs::Odometry();
+    // odom_sub = nh->subscribe<nav_msgs::Odometry>("/odom", 10, odom_callback);
+    // odom_msg = nav_msgs::Odometry();
     }
     int lqrLoop(){
         if (i < num_steps){
@@ -39,11 +46,11 @@ class lqrController{
         msg.angular.z = 0;
         vel_pub.publish(msg);
     }
-    void odom_callback(const nav_msgs::Odometry::ConstPtr& pose_msg)
-    {
-        double odom_msg = pose_msg->pose.pose.position.z;
-        odom_updated = true; 
-    }
+    // void odom_callback(const nav_msgs::Odometry::ConstPtr& pose_msg)
+    // {
+    //     double odom_msg = pose_msg->pose.pose.position.z;
+    //     odom_updated = true; 
+    // }
 };
 //     ros::Subscriber odom_sub;
 //     odom_sub = nh.subscribe<Odometry>("/odom", 10, odom_callback);
@@ -64,8 +71,17 @@ class lqrController{
 
 // };
 int main (int argc, char** argv){
-    int T = 150; int num_steps = 15; int n = 3; int m = 2;int p = 3;
-    t = Eigen::
+    // typedef {VectorXf|ArrayXf} VectorXi;
+    
+    int T = 150; double num_steps = 15000; int n = 3; int m = 2;int p = 3;
+    Eigen::VectorXd t = (Eigen::VectorXd::LinSpaced(num_steps,0.0,135.0));
+    Eigen::VectorXd t_ten = t/10;
+    Eigen::VectorXd t_twenty = t/20;
+    Eigen::VectorXd x1 = t_ten.Eigen::VectorXd::array().sin();
+    // std::cout << x1 << std::endl;
+    Eigen::VectorXd x2 = t_twenty.Eigen::VectorXd::array().sin();
+    matplotlibcpp::plot (x1,x2);
+    matplotlibcpp::show();
     ROS_INFO_STREAM ("Create LQR Controller node");
     ROS_INFO_STREAM ("..........................");
     ros::init(argc, argv, "lqrController");
@@ -74,7 +90,7 @@ int main (int argc, char** argv){
     lqrController robot = lqrController(&nh);
     while (ros::ok()){
     for (int i = 0; i < num_steps; i++){
-        robot.lqrLoop(robot.odom_callback,num_steps,i);        
+        robot.lqrLoop();        
     } 
     robot.robot_stop();
     ros::spinOnce();
