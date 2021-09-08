@@ -73,15 +73,23 @@ class lqrController{
 int main (int argc, char** argv){
     // typedef {VectorXf|ArrayXf} VectorXi;
     
-    int T = 150; double num_steps = 15000; int n = 3; int m = 2;int p = 3;
+    double T = 150; double num_steps = 15; int n = 3; int m = 2;int p = 3;
     Eigen::VectorXd t = (Eigen::VectorXd::LinSpaced(num_steps,0.0,135.0));
     Eigen::VectorXd t_ten = t/10;
     Eigen::VectorXd t_twenty = t/20;
     Eigen::VectorXd x1 = t_ten.Eigen::VectorXd::array().sin();
     // std::cout << x1 << std::endl;
     Eigen::VectorXd x2 = t_twenty.Eigen::VectorXd::array().sin();
-    matplotlibcpp::plot (x1,x2);
-    matplotlibcpp::show();
+    // matplotlibcpp::plot (x1,x2);
+    // matplotlibcpp::show();
+    Eigen::MatrixXd parametric_func = Eigen::MatrixXd::Zero(2,num_steps);
+    parametric_func.topRows(1) = x1.transpose();
+    parametric_func.bottomRows(1) = x2.transpose();
+    std::cout << parametric_func << std::endl;
+    double dt = T/num_steps;
+    Eigen::MatrixXd s = Eigen::MatrixXd::Zero(2,num_steps);
+    Eigen::MatrixXd stemp = Eigen::MatrixXd::array();
+
     ROS_INFO_STREAM ("Create LQR Controller node");
     ROS_INFO_STREAM ("..........................");
     ros::init(argc, argv, "lqrController");
