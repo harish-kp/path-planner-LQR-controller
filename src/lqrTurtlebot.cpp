@@ -11,6 +11,9 @@ using namespace Eigen;
 #include<math.h>
 // #include <sensor_msgs>
 #include "matplotlib/matplotlibcpp.h"
+// #include "boost/multi_array.hpp"s
+#include <unsupported/Eigen/CXX11/Tensor>
+
 // #include "madplotlibcpp.h"
 #include "iostream"
 
@@ -85,10 +88,37 @@ int main (int argc, char** argv){
     Eigen::MatrixXd parametric_func = Eigen::MatrixXd::Zero(2,num_steps);
     parametric_func.topRows(1) = x1.transpose();
     parametric_func.bottomRows(1) = x2.transpose();
+    // parametric_func = parametric_func.transpose();    
     std::cout << parametric_func << std::endl;
     double dt = T/num_steps;
     Eigen::MatrixXd s = Eigen::MatrixXd::Zero(2,num_steps);
-    Eigen::MatrixXd stemp = Eigen::MatrixXd::array();
+    Eigen::Tensor<double, 3> tensor(num_steps,2, 2);
+    // std::cout << s << std::endl;
+    std::cout << "-----------------------------"<< std::endl;
+    Eigen::MatrixXd A_l = Eigen::MatrixXd::Identity(2,2);
+    std::cout << A_l << std::endl;
+    Eigen::MatrixXd B_l = dt*Eigen::MatrixXd::Identity(2,2);
+    std::cout << "-----------------------------"<< std::endl;
+    std::cout << B_l << std::endl;
+    Eigen::MatrixXd Q_l = Eigen::MatrixXd::Identity(2,2);
+    std::cout << "-----------------------------"<< std::endl;
+    std::cout << Q_l << std::endl;
+    double degree = 3;
+    Eigen::MatrixXd B_lh = B_l.conjugate().transpose();
+    std::cout << "-----------------------------"<< std::endl;
+    std::cout << Q_l << std::endl;
+    double ref_length = parametric_func.topRows(1).size();
+    std::cout << "-----------------------------"<< std::endl;
+    std::cout << ref_length << std::endl;
+    Eigen::MatrixXd concat_matrix = Eigen::MatrixXd::Ones(1,ref_length);
+    std::cout << "-----------------------------"<< std::endl;
+    std::cout << concat_matrix << std::endl;
+    Eigen::MatrixXd ref_traj(parametric_func.rows()+concat_matrix.rows(), parametric_func.cols()); 
+    ref_traj << parametric_func, concat_matrix;
+    std::cout << "-----------------------------"<< std::endl;
+    std::cout << ref_traj << std::endl;
+    // std::cout << tensor << std::endl;
+    // Eigen::MatrixXd stemp = Eigen::MatrixXd::array();
 
     ROS_INFO_STREAM ("Create LQR Controller node");
     ROS_INFO_STREAM ("..........................");
