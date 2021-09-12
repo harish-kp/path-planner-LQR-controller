@@ -22,9 +22,9 @@ using namespace Eigen;
 class lqrController{
     private:
     int T = 150; int num_steps = 15; int n = 3; int m = 2;int p = 3; int i;   
-    float A[3][3] = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}; float C[3][3]= {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}};
-    float B[3][2] = {{1,0}, {1,0}, {0,1}}; float R[2][2]={{1,0}, {0,1}}; 
-    float Q[3][3] = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}};
+    Eigen::MatrixXd A,C,Q = Eigen::MatrixXd::Identity(3,3);
+    Eigen::MatrixXd R = Eigen::MatrixXd::Identity(2,2);
+    double B[3][2] = {{1,0}, {1,0}, {0,1}};  
     bool odom_updated;
 
     ros::Publisher vel_pub;
@@ -117,6 +117,27 @@ int main (int argc, char** argv){
     ref_traj << parametric_func, concat_matrix;
     std::cout << "-----------------------------"<< std::endl;
     std::cout << ref_traj << std::endl;
+    // std::cout << ref_traj(1,1) << std::endl;
+    // double temp = (ref_traj(1,2)- ref_traj(1,1))/(ref_traj(0,2)-ref_traj(0,1));
+    // ref_traj (2,0) = std::atan(temp);
+    for (int i=0; i <= ref_length-2; i++){
+        double temp = (ref_traj(1,i+1)- ref_traj(1,i))/(ref_traj(0,i+1)-ref_traj(0,i));
+        ref_traj (2,i) = std::atan(temp*(3.1514/180));
+    }
+    ref_traj(2,ref_length-1) = ref_traj(2,ref_length-2);
+    std::cout << "-----------------------------"<< std::endl;
+    std::cout << ref_traj.transpose().row(1) << std::endl;
+    Eigen::MatrixXd start_point = ref_traj.transpose().row(0);
+    Eigen::MatrixXd target = ref_traj.transpose().row(ref_length-1);
+    std::cout << "-----------------------------"<< std::endl;
+    std::cout << start_point << std::endl;
+    std::cout << target << std::endl;
+    if (dt<=0){ dt = 1e-4;}
+    if (n<=0){ n = 2;}
+    if (m<=0){ m = 2;}
+    if (p<=0){ p = 2;}
+    Eigen::MatrixXd x_hat = Eigen::MatrixXd::Zero(n,num_steps);
+    Eigen::MatrixXd x0 = start_point;
     // std::cout << tensor << std::endl;
     // Eigen::MatrixXd stemp = Eigen::MatrixXd::array();
 

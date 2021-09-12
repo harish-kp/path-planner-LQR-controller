@@ -24,7 +24,7 @@ print("................................")
 
 #Change T and num_steps to modify runtime and dt (dt = T/num_steps)
 T = 150
-num_steps = 15000
+num_steps = 15
 
 n = 3
 m = 2
@@ -107,10 +107,11 @@ rdd = np.zeros((2,ref_length-2))
 for i in range(0,ref_length-2):
     rdd[0,i] = rd[0,i+1]-rd[0,i]
     rdd[1,i] = rd[1,i+1]-rd[1,i]
-
+print(ref_traj)
 # redefine start point and target
 # start_point = ref_traj(:,1)
 start_point = ref_traj[:,0]
+print (start_point)
 target = ref_traj[:,ref_length-1]
 
 if dt <= 0:
