@@ -18,3 +18,4 @@ In order to change the robot, execute export TURTLEBOT3_MODEL=model where model 
 #Reference
 
 Eigen Tensor matrix access (https://stackoverflow.com/questions/48650751/eigentensor-how-to-access-matrix-from-tensor)
+Eigen::Tensor to Eigen::Matrix conversion (https://stackoverflow.com/questions/48795789/eigen-unsupported-tensor-to-eigen-matrix)
