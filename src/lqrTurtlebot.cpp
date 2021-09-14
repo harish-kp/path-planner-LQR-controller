@@ -17,6 +17,12 @@ using namespace Eigen;
 // #include "madplotlibcpp.h"
 #include "iostream"
 
+template<typename T, typename sizeType, typename Device = Eigen::DefaultDevice>
+auto MatrixCast(const Eigen::TensorBase<T, Eigen::ReadOnlyAccessors> &expr, const sizeType rows, const sizeType cols, const Device &device = Device()) {
+    auto tensor  = asEval(expr, device);
+    using Scalar = typename Eigen::internal::remove_const<typename decltype(tensor)::Scalar>::type;
+    return static_cast<MatrixType<Scalar>>(Eigen::Map<const MatrixType<Scalar>>(tensor.data(), rows, cols));
+}
 
 
 class lqrController{
@@ -89,34 +95,41 @@ int main (int argc, char** argv){
     parametric_func.topRows(1) = x1.transpose();
     parametric_func.bottomRows(1) = x2.transpose();
     // parametric_func = parametric_func.transpose();    
-    std::cout << parametric_func << std::endl;
+    // std::cout << parametric_func << std::endl;
     double dt = T/num_steps;
     Eigen::MatrixXd s = Eigen::MatrixXd::Zero(2,num_steps);
-    Eigen::Tensor<double, 3> tensor(num_steps,2, 2);
+    Eigen::Tensor<double, 3> b(num_steps,2, 2);
+    b.setRandom();
+    // std::array<double,3> offset = {0,0,0};         //Starting point
+    std::array<double,3> extent = {1,2,2};       //Finish point
+    std::array<double,2> shape2 = {2,2};
+    // std::cout <<  b.slice(offset, extent).reshape(shape2) << std::endl;
+    // std::array<double,3> offset1 = {1,0,0};
+    // std::cout <<  b.slice(offset1, extent).reshape(shape2) << std::endl;
     // std::cout << s << std::endl;
-    std::cout << "-----------------------------"<< std::endl;
+    // std::cout << "-----------------------------"<< std::endl;
     Eigen::MatrixXd A_l = Eigen::MatrixXd::Identity(2,2);
-    std::cout << A_l << std::endl;
+    // std::cout << A_l << std::endl;
     Eigen::MatrixXd B_l = dt*Eigen::MatrixXd::Identity(2,2);
-    std::cout << "-----------------------------"<< std::endl;
-    std::cout << B_l << std::endl;
+    // std::cout << "-----------------------------"<< std::endl;
+    // std::cout << B_l << std::endl;
     Eigen::MatrixXd Q_l = Eigen::MatrixXd::Identity(2,2);
-    std::cout << "-----------------------------"<< std::endl;
-    std::cout << Q_l << std::endl;
+    // std::cout << "-----------------------------"<< std::endl;
+    // std::cout << Q_l << std::endl;
     double degree = 3;
     Eigen::MatrixXd B_lh = B_l.conjugate().transpose();
-    std::cout << "-----------------------------"<< std::endl;
-    std::cout << Q_l << std::endl;
+    // std::cout << "-----------------------------"<< std::endl;
+    // std::cout << Q_l << std::endl;
     double ref_length = parametric_func.topRows(1).size();
-    std::cout << "-----------------------------"<< std::endl;
-    std::cout << ref_length << std::endl;
+    // std::cout << "-----------------------------"<< std::endl;
+    // std::cout << ref_length << std::endl;
     Eigen::MatrixXd concat_matrix = Eigen::MatrixXd::Ones(1,ref_length);
-    std::cout << "-----------------------------"<< std::endl;
-    std::cout << concat_matrix << std::endl;
+    // std::cout << "-----------------------------"<< std::endl;
+    // std::cout << concat_matrix << std::endl;
     Eigen::MatrixXd ref_traj(parametric_func.rows()+concat_matrix.rows(), parametric_func.cols()); 
     ref_traj << parametric_func, concat_matrix;
-    std::cout << "-----------------------------"<< std::endl;
-    std::cout << ref_traj << std::endl;
+    // std::cout << "-----------------------------"<< std::endl;
+    // std::cout << ref_traj << std::endl;
     // std::cout << ref_traj(1,1) << std::endl;
     // double temp = (ref_traj(1,2)- ref_traj(1,1))/(ref_traj(0,2)-ref_traj(0,1));
     // ref_traj (2,0) = std::atan(temp);
@@ -125,19 +138,41 @@ int main (int argc, char** argv){
         ref_traj (2,i) = std::atan(temp*(3.1514/180));
     }
     ref_traj(2,ref_length-1) = ref_traj(2,ref_length-2);
-    std::cout << "-----------------------------"<< std::endl;
-    std::cout << ref_traj.transpose().row(1) << std::endl;
+    // std::cout << "-----------------------------"<< std::endl;
+    // std::cout << ref_traj.transpose().row(1) << std::endl;
     Eigen::MatrixXd start_point = ref_traj.transpose().row(0);
     Eigen::MatrixXd target = ref_traj.transpose().row(ref_length-1);
-    std::cout << "-----------------------------"<< std::endl;
-    std::cout << start_point << std::endl;
-    std::cout << target << std::endl;
-    if (dt<=0){ dt = 1e-4;}
-    if (n<=0){ n = 2;}
-    if (m<=0){ m = 2;}
-    if (p<=0){ p = 2;}
+    // std::cout << "-----------------------------"<< std::endl;
+    // std::cout << start_point << std::endl;
+    // std::cout << target << std::endl;
+    if (dt<=0){ 
+        dt = 1e-4;
+    }
+    if (n<=0){ 
+        n = 2;
+    }
+    if (m<=0){ 
+        m = 2;
+    }
+    if (p<=0){ 
+        p = 2;
+    }
     Eigen::MatrixXd x_hat = Eigen::MatrixXd::Zero(n,num_steps);
     Eigen::MatrixXd x0 = start_point;
+    x_hat.col(0) = x0.transpose();
+    // std::cout << "-----------------------------"<< std::endl;
+    // std::cout << x_hat << std::endl;
+    Eigen::MatrixXd u = Eigen::MatrixXd::Zero(m,num_steps);
+    Eigen::MatrixXd y = Eigen::MatrixXd::Zero(p,num_steps);
+    bool finish = false;
+
+    for (int i = num_steps-2; i > 0; i-1){
+        std::array<double,3> offset = {i+1,0,0};
+        Eigen::Tensor<double, 2> b_temp = b.slice(offset, extent).reshape(shape2);
+        Eigen::MatrixXd b_temp_mat = MatrixCast;
+        // Eigen::MatrixXd k = B_l.transpose() * b_temp.Eigen::MatrixXd::matrix() * B_l;
+        // std::cout << k << std::endl;
+    }
     // std::cout << tensor << std::endl;
     // Eigen::MatrixXd stemp = Eigen::MatrixXd::array();
 

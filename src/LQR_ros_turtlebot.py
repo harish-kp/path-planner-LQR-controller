@@ -161,7 +161,7 @@ x_real[:,0] = x0
 
 G = Sigma_w
 
-P = np.zeros((n,n,num_steps))
+# P = np.zeros((n,n,num_steps))
 
 Sigma_x = np.zeros((n, n, num_steps))
 
@@ -195,9 +195,9 @@ B = np.array([[np.cos(0.0079),0],
               [0,1]])
 y[:,0] = state_init
 
-P = np.zeros(b.shape)
-for i in range (0,num_steps):
-    P[:,:,i] = np.subtract(b[:,:,i],Q_l)
+# P = np.zeros(b.shape)
+# for i in range (0,num_steps):
+#     P[:,:,i] = np.subtract(b[:,:,i],Q_l)
 
 Phi = np.zeros((n,n,num_steps))
 Theta = np.zeros((n,p,num_steps))
