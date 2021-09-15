@@ -16,6 +16,19 @@ using namespace Eigen;
 
 // #include "madplotlibcpp.h"
 #include "iostream"
+template<typename T>
+using  MatrixType = Eigen::Matrix<T,Eigen::Dynamic, Eigen::Dynamic>;
+
+template<typename T, typename Device = Eigen::DefaultDevice>
+auto asEval(const Eigen::TensorBase<T, Eigen::ReadOnlyAccessors> &expr, // An Eigen::TensorBase object (Tensor, TensorMap, TensorExpr... )
+            const Device & device = Device()                            // Override to evaluate on another device, e.g. thread pool or gpu.
+            ) {
+    using Evaluator = Eigen::TensorEvaluator<const Eigen::TensorForcedEvalOp<const T>, Device>;
+    Eigen::TensorForcedEvalOp<const T> eval = expr.eval();
+    Evaluator                          tensor(eval, device);
+    tensor.evalSubExprsIfNeeded(nullptr);
+    return tensor;
+}
 
 template<typename T, typename sizeType, typename Device = Eigen::DefaultDevice>
 auto MatrixCast(const Eigen::TensorBase<T, Eigen::ReadOnlyAccessors> &expr, const sizeType rows, const sizeType cols, const Device &device = Device()) {
@@ -83,6 +96,7 @@ int main (int argc, char** argv){
     // typedef {VectorXf|ArrayXf} VectorXi;
     
     double T = 150; double num_steps = 15; int n = 3; int m = 2;int p = 3;
+    Eigen::MatrixXd R = Eigen::MatrixXd::Identity(2,2);
     Eigen::VectorXd t = (Eigen::VectorXd::LinSpaced(num_steps,0.0,135.0));
     Eigen::VectorXd t_ten = t/10;
     Eigen::VectorXd t_twenty = t/20;
@@ -103,10 +117,9 @@ int main (int argc, char** argv){
     // std::array<double,3> offset = {0,0,0};         //Starting point
     std::array<double,3> extent = {1,2,2};       //Finish point
     std::array<double,2> shape2 = {2,2};
-    // std::cout <<  b.slice(offset, extent).reshape(shape2) << std::endl;
     // std::array<double,3> offset1 = {1,0,0};
     // std::cout <<  b.slice(offset1, extent).reshape(shape2) << std::endl;
-    // std::cout << s << std::endl;
+    // std::cout << b_temp_mat << std::endl;
     // std::cout << "-----------------------------"<< std::endl;
     Eigen::MatrixXd A_l = Eigen::MatrixXd::Identity(2,2);
     // std::cout << A_l << std::endl;
@@ -138,6 +151,18 @@ int main (int argc, char** argv){
         ref_traj (2,i) = std::atan(temp*(3.1514/180));
     }
     ref_traj(2,ref_length-1) = ref_traj(2,ref_length-2);
+    Eigen::MatrixXd ref_traj_dot = Eigen::MatrixXd::Zero(3,ref_length);
+    for (int i = 1; i < ref_length; i++){
+        ref_traj_dot(0,i) = (ref_traj(0,i) - ref_traj(0,i-1))/dt;
+        ref_traj_dot(1,i) = (ref_traj(1,i) - ref_traj(1,i-1))/dt;
+        ref_traj_dot(2,i) = (ref_traj(2,i) - ref_traj(2,i-1))/dt;
+    }
+    Eigen::MatrixXd ref_traj_db_dot = Eigen::MatrixXd::Zero(3,ref_length);
+    for (int i = 0; i < ref_length-1; i++){
+        ref_traj_db_dot(0,i) = (ref_traj_dot(0,i) - ref_traj_dot(0,i-1))/dt;
+        ref_traj_db_dot(1,i) = (ref_traj_dot(1,i) - ref_traj_dot(1,i-1))/dt;
+        ref_traj_db_dot(2,i) = (ref_traj_dot(2,i) - ref_traj_dot(2,i-1))/dt;
+    }
     // std::cout << "-----------------------------"<< std::endl;
     // std::cout << ref_traj.transpose().row(1) << std::endl;
     Eigen::MatrixXd start_point = ref_traj.transpose().row(0);
@@ -169,9 +194,9 @@ int main (int argc, char** argv){
     for (int i = num_steps-2; i > 0; i-1){
         std::array<double,3> offset = {i+1,0,0};
         Eigen::Tensor<double, 2> b_temp = b.slice(offset, extent).reshape(shape2);
-        Eigen::MatrixXd b_temp_mat = MatrixCast;
-        // Eigen::MatrixXd k = B_l.transpose() * b_temp.Eigen::MatrixXd::matrix() * B_l;
-        // std::cout << k << std::endl;
+        Eigen::MatrixXd b_temp_mat = MatrixCast(b_temp,2,2);
+        Eigen::MatrixXd k = -((B_l.transpose() * b_temp_mat * B_l + R).inverse()*B_l.transpose()*b_temp_mat)*A_l;
+        std::cout << k << std::endl;
     }
     // std::cout << tensor << std::endl;
     // Eigen::MatrixXd stemp = Eigen::MatrixXd::array();
