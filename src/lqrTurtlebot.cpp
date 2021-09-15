@@ -113,7 +113,7 @@ int main (int argc, char** argv){
     double dt = T/num_steps;
     Eigen::MatrixXd s = Eigen::MatrixXd::Zero(2,num_steps);
     Eigen::Tensor<double, 3> b(num_steps,2, 2);
-    b.setRandom();
+    b.setZero();
     // std::array<double,3> offset = {0,0,0};         //Starting point
     std::array<double,3> extent = {1,2,2};       //Finish point
     std::array<double,2> shape2 = {2,2};
@@ -152,16 +152,16 @@ int main (int argc, char** argv){
     }
     ref_traj(2,ref_length-1) = ref_traj(2,ref_length-2);
     Eigen::MatrixXd ref_traj_dot = Eigen::MatrixXd::Zero(3,ref_length);
-    for (int i = 1; i < ref_length; i++){
+    for (int i = 1; i <= ref_length-1; i++){
         ref_traj_dot(0,i) = (ref_traj(0,i) - ref_traj(0,i-1))/dt;
         ref_traj_dot(1,i) = (ref_traj(1,i) - ref_traj(1,i-1))/dt;
         ref_traj_dot(2,i) = (ref_traj(2,i) - ref_traj(2,i-1))/dt;
     }
     Eigen::MatrixXd ref_traj_db_dot = Eigen::MatrixXd::Zero(3,ref_length);
-    for (int i = 0; i < ref_length-1; i++){
-        ref_traj_db_dot(0,i) = (ref_traj_dot(0,i) - ref_traj_dot(0,i-1))/dt;
-        ref_traj_db_dot(1,i) = (ref_traj_dot(1,i) - ref_traj_dot(1,i-1))/dt;
-        ref_traj_db_dot(2,i) = (ref_traj_dot(2,i) - ref_traj_dot(2,i-1))/dt;
+    for (int i = 0; i <= ref_length-2; i++){
+        ref_traj_db_dot(0,i) = (ref_traj_dot(0,i+1) - ref_traj_dot(0,i))/dt;
+        ref_traj_db_dot(1,i) = (ref_traj_dot(1,i+1) - ref_traj_dot(1,i))/dt;
+        ref_traj_db_dot(2,i) = (ref_traj_dot(2,i+1) - ref_traj_dot(2,i))/dt;
     }
     // std::cout << "-----------------------------"<< std::endl;
     // std::cout << ref_traj.transpose().row(1) << std::endl;
@@ -191,12 +191,12 @@ int main (int argc, char** argv){
     Eigen::MatrixXd y = Eigen::MatrixXd::Zero(p,num_steps);
     bool finish = false;
 
-    for (int i = num_steps-2; i > 0; i-1){
+    for (int i = num_steps-2; i > 0; i--){
         std::array<double,3> offset = {i+1,0,0};
         Eigen::Tensor<double, 2> b_temp = b.slice(offset, extent).reshape(shape2);
         Eigen::MatrixXd b_temp_mat = MatrixCast(b_temp,2,2);
         Eigen::MatrixXd k = -((B_l.transpose() * b_temp_mat * B_l + R).inverse()*B_l.transpose()*b_temp_mat)*A_l;
-        std::cout << k << std::endl;
+        // std::cout << k << std::endl;
     }
     // std::cout << tensor << std::endl;
     // Eigen::MatrixXd stemp = Eigen::MatrixXd::array();
