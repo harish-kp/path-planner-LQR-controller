@@ -32,9 +32,9 @@ In order to change the robot, execute `export TURTLEBOT3_MODEL=model` where mode
 [ROS Tutorials](http://wiki.ros.org/ROS/Tutorials)  
 [Turtlebot3 Quick start](https://emanual.robotis.com/docs/en/platform/turtlebot3/quick-start/)  
 [Turtlebot3 Simulation packages](https://emanual.robotis.com/docs/en/platform/turtlebot3/simulation/#gazebo-simulation)  
-[Turtlebot3 messages](https://github.com/ROBOTIS-GIT/turtlebot3_msgs)  '
-[Control Toolbox C++](https://github.com/ethz-adrl/control-toolbox)
-[Eigen](http://eigen.tuxfamily.org/dox/GettingStarted.html)
+[Turtlebot3 messages](https://github.com/ROBOTIS-GIT/turtlebot3_msgs)  
+[Control Toolbox C++](https://github.com/ethz-adrl/control-toolbox)  
+[Eigen](http://eigen.tuxfamily.org/dox/GettingStarted.html)  
 J.Snider.,Automatic Steering Methods for Autonomous Automobile Path Tracking, 2011.  
 R Siegwart, I R Nourbaksh,Introduction to Autonomous Mobile Robots, MIT Press, 2004.  
 G. Oriolo, A. D. Luca, and M. Vendittelli, WMR control via dynamic feedback linearization: design, implementation, and experimental validation, IEEE Transactions on Control Systems Technology, vol. 10, no. 6, pp. 835–852, 2002.  
