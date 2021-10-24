@@ -1,10 +1,11 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 import numpy as np
 import rospy
 import roslib
 import tf
 import math
 from tf.transformations import euler_from_quaternion
+from control import lqr
 import copy
 import time
 import matplotlib.pyplot as plt
@@ -177,7 +178,8 @@ finish = False
 
 #Calculate s matrix
 for j in range(num_steps-2, -1, -1):
-    k = -(np.linalg.inv(B_l.conj().transpose()*b[:,:,j+1]*B_l+R)*B_l.conj().transpose()*b[:,:,j+1])*A_l
+    k = lqr(A_l,B_l,Q,R)
+    # k = -(np.linalg.inv(B_l.conj().transpose()*b[:,:,j+1]*B_l+R)*B_l.conj().transpose()*b[:,:,j+1])*A_l
     b[:,:,j] = A_l.conj().transpose()*(b[:,:,j+1]-b[:,:,j+1]*B_l*np.linalg.inv(B_l.conj().transpose()*b[:,:,j+1]*B_l+R)*B_l.conj().transpose()*b[:,:,j+1])*A_l+Q_l
     ref_traj_a = np.array([[ref_traj[0,j+1]],[ref_traj[1,j+1]]])
     stemp = np.matmul((A_l.conj().transpose() + k.conj().transpose()*B_l.conj().transpose()),stemp) - np.matmul(Q_l,ref_traj_a)

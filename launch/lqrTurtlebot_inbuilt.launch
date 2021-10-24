@@ -1,0 +1,18 @@
+<launch>
+    <arg name="model" default="$(env TURTLEBOT3_MODEL)" doc="model type [burger]"/>
+    <arg name = "x_pos" default = "0.0"/>  
+    <param name="param_x" value="$(arg x_pos)"/>	
+    <arg name = "y_pos" default = "0.0" /> 
+    <param name="param_y" value="$(arg y_pos)"/>
+    <arg name = "z_pos" default ="0.0"/>
+    <param name="param_z" value="$(arg z_pos)"/> 	
+    <node name="lqr_controller" pkg="path-planner" type="LQR_ros_turtlebot_inbuilt.py" output="screen" />
+
+    <include file="$(find turtlebot3_gazebo)/launch/turtlebot3_empty_world.launch">
+	<arg name = "x_pos" value = "$(arg x_pos)" /> 
+	<arg name = "y_pos" value = "$(arg y_pos)" /> 
+	<arg name = "z_pos" value = "$(arg z_pos)" /> 
+    </include>
+
+
+</launch>

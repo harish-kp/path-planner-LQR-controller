@@ -11,6 +11,7 @@ using namespace Eigen;
 #include<math.h>
 // #include <sensor_msgs>
 #include "matplotlib/matplotlibcpp.h"
+// #include "tensorMatrix.h"
 // #include "boost/multi_array.hpp"s
 #include <unsupported/Eigen/CXX11/Tensor>
 
@@ -191,13 +192,13 @@ int main (int argc, char** argv){
     Eigen::MatrixXd y = Eigen::MatrixXd::Zero(p,num_steps);
     bool finish = false;
 
-    for (int i = num_steps-2; i > 0; i--){
-        std::array<double,3> offset = {i+1,0,0};
-        Eigen::Tensor<double, 2> b_temp = b.slice(offset, extent).reshape(shape2);
-        Eigen::MatrixXd b_temp_mat = MatrixCast(b_temp,2,2);
-        Eigen::MatrixXd k = -((B_l.transpose() * b_temp_mat * B_l + R).inverse()*B_l.transpose()*b_temp_mat)*A_l;
-        // std::cout << k << std::endl;
-    }
+    // for (int i = num_steps-2; i > 0; i--){
+    //     std::array<double,3> offset = {i+1,0,0};
+    //     Eigen::Tensor<double, 2> b_temp = b.slice(offset, extent).reshape(shape2);
+    //     Eigen::MatrixXd b_temp_mat = MatrixCast(b_temp,2,2);
+    //     Eigen::MatrixXd k = -((B_l.transpose() * b_temp_mat * B_l + R).inverse()*B_l.transpose()*b_temp_mat)*A_l;
+    //     // std::cout << k << std::endl;
+    // }
     // std::cout << tensor << std::endl;
     // Eigen::MatrixXd stemp = Eigen::MatrixXd::array();
 
