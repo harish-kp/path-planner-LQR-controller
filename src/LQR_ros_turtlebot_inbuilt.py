@@ -2,9 +2,9 @@
 import numpy as np
 import rospy
 import roslib
-import tf
+import transforms3d
 import math
-from tf.transformations import euler_from_quaternion
+# from transforms3d import euler.euler2quat as euler2quat
 from control import lqr
 import copy
 import time
@@ -17,7 +17,7 @@ else:
   import tty, termios
 from geometry_msgs.msg import PoseStamped, Twist, Pose, PoseWithCovariance
 from nav_msgs.msg import Odometry
-from tf.transformations import euler_from_quaternion
+# from transforms3d import euler2quat
 
 #Initialize Controller Variables
 print("Initializing Controller Variables")
@@ -108,11 +108,11 @@ rdd = np.zeros((2,ref_length-2))
 for i in range(0,ref_length-2):
     rdd[0,i] = rd[0,i+1]-rd[0,i]
     rdd[1,i] = rd[1,i+1]-rd[1,i]
-print(ref_traj)
+# print(ref_traj)
 # redefine start point and target
 # start_point = ref_traj(:,1)
 start_point = ref_traj[:,0]
-print (start_point)
+# print (start_point)
 target = ref_traj[:,ref_length-1]
 
 if dt <= 0:
@@ -178,13 +178,16 @@ finish = False
 
 #Calculate s matrix
 for j in range(num_steps-2, -1, -1):
-    k = lqr(A_l,B_l,Q,R)
-    # k = -(np.linalg.inv(B_l.conj().transpose()*b[:,:,j+1]*B_l+R)*B_l.conj().transpose()*b[:,:,j+1])*A_l
+    k,s,e = lqr(A,B,Q,R)
+    print (k)
+    print (s)
+    k1 = -(np.linalg.inv(B_l.conj().transpose()*b[:,:,j+1]*B_l+R)*B_l.conj().transpose()*b[:,:,j+1])*A_l
+    print (k1)
     b[:,:,j] = A_l.conj().transpose()*(b[:,:,j+1]-b[:,:,j+1]*B_l*np.linalg.inv(B_l.conj().transpose()*b[:,:,j+1]*B_l+R)*B_l.conj().transpose()*b[:,:,j+1])*A_l+Q_l
     ref_traj_a = np.array([[ref_traj[0,j+1]],[ref_traj[1,j+1]]])
-    stemp = np.matmul((A_l.conj().transpose() + k.conj().transpose()*B_l.conj().transpose()),stemp) - np.matmul(Q_l,ref_traj_a)
-    s[0,j] = stemp[0]
-    s[1,j] = stemp[1]
+    # stemp = np.matmul((A_l.conj().transpose() + k*B_l.conj().transpose()),stemp) - np.matmul(Q_l,ref_traj_a)
+    stemp[0,j] = s[0]
+    stemp[1,j] = s[1]
 
 first_step_angle = np.arctan((ref_traj[1,1] - ref_traj[1,0])/(ref_traj[0,1] - ref_traj[0,0]))
 init_angle = 0
@@ -275,7 +278,7 @@ class lqr_controller:
             tbot_x = msg.pose.pose.position.x
             tbot_y = msg.pose.pose.position.y
             quat = (msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w)
-            angles = euler_from_quaternion(quat)
+            angles = transforms3d.euler.euler2quat(quat)
             y[:,i] = [tbot_x, tbot_y, angles[2]]
 
             z = y[:,i].reshape(-1,1)-np.matmul(C,x_temp)
