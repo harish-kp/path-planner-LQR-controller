@@ -186,8 +186,8 @@ for j in range(num_steps-2, -1, -1):
     b[:,:,j] = A_l.conj().transpose()*(b[:,:,j+1]-b[:,:,j+1]*B_l*np.linalg.inv(B_l.conj().transpose()*b[:,:,j+1]*B_l+R)*B_l.conj().transpose()*b[:,:,j+1])*A_l+Q_l
     ref_traj_a = np.array([[ref_traj[0,j+1]],[ref_traj[1,j+1]]])
     # stemp = np.matmul((A_l.conj().transpose() + k*B_l.conj().transpose()),stemp) - np.matmul(Q_l,ref_traj_a)
-    stemp[0,j] = s[0]
-    stemp[1,j] = s[1]
+    # stemp[0,j] = s[0,j]
+    # stemp[1,j] = s[1,j]
 
 first_step_angle = np.arctan((ref_traj[1,1] - ref_traj[1,0])/(ref_traj[0,1] - ref_traj[0,0]))
 init_angle = 0
