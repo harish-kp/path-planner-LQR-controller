@@ -64,17 +64,17 @@ parametric_func[0] = x1
 parametric_func[1] = x2
 
 dt = float(T)/float(num_steps)
-s = np.zeros((2, num_steps))
-stemp = np.array([[0],[0]])
-b = np.zeros((2,2,num_steps))
-s[:,num_steps-1]=[0,0]
-A_l = np.identity(2)
-B_l = dt*np.identity(2)
-Q_l = np.identity(2)
+s = np.zeros((3, num_steps))
+# stemp = np.array([[0],[0]])
+b = np.zeros((3,3,num_steps))
+s[:,num_steps-1]=[0,0,0]
+A_l = np.identity(3)
+B_l = dt*np.identity(3)
+Q_l = np.identity(3)
 degree = 3
 B_lh = B_l.conj().transpose()
-g_D = rd_tar^2
-g_U = rd_obs^2
+# g_D = rd_tar^2
+# g_U = rd_obs^2
 
 ref_traj = parametric_func
 diffrc = ref_traj[:,0]
@@ -181,8 +181,8 @@ for j in range(num_steps-2, -1, -1):
     k,s,e = lqr(A,B,Q,R)
     print (k)
     print (s)
-    k1 = -(np.linalg.inv(B_l.conj().transpose()*b[:,:,j+1]*B_l+R)*B_l.conj().transpose()*b[:,:,j+1])*A_l
-    print (k1)
+    # k1 = -(np.linalg.inv(B_l.conj().transpose()*b[:,:,j+1]*B_l+R)*B_l.conj().transpose()*b[:,:,j+1])*A_l
+    # print (k1)
     b[:,:,j] = A_l.conj().transpose()*(b[:,:,j+1]-b[:,:,j+1]*B_l*np.linalg.inv(B_l.conj().transpose()*b[:,:,j+1]*B_l+R)*B_l.conj().transpose()*b[:,:,j+1])*A_l+Q_l
     ref_traj_a = np.array([[ref_traj[0,j+1]],[ref_traj[1,j+1]]])
     # stemp = np.matmul((A_l.conj().transpose() + k*B_l.conj().transpose()),stemp) - np.matmul(Q_l,ref_traj_a)
