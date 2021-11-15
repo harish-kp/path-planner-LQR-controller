@@ -64,13 +64,13 @@ parametric_func[0] = x1
 parametric_func[1] = x2
 
 dt = float(T)/float(num_steps)
-s = np.zeros((3, num_steps))
-# stemp = np.array([[0],[0]])
-b = np.zeros((3,3,num_steps))
-s[:,num_steps-1]=[0,0,0]
-A_l = np.identity(3)
-B_l = dt*np.identity(3)
-Q_l = np.identity(3)
+s = np.zeros((2, num_steps))
+stemp = np.array([[0],[0]])
+b = np.zeros((2,2,num_steps))
+s[:,num_steps-1]=[0,0]
+A_l = np.identity(2)
+B_l = dt*np.identity(2)
+Q_l = np.identity(2)
 degree = 3
 B_lh = B_l.conj().transpose()
 # g_D = rd_tar^2
@@ -179,15 +179,15 @@ finish = False
 #Calculate s matrix
 for j in range(num_steps-2, -1, -1):
     k,s,e = lqr(A,B,Q,R)
-    print (k)
-    print (s)
+    # print (k)
+    # print (s)
     # k1 = -(np.linalg.inv(B_l.conj().transpose()*b[:,:,j+1]*B_l+R)*B_l.conj().transpose()*b[:,:,j+1])*A_l
     # print (k1)
     b[:,:,j] = A_l.conj().transpose()*(b[:,:,j+1]-b[:,:,j+1]*B_l*np.linalg.inv(B_l.conj().transpose()*b[:,:,j+1]*B_l+R)*B_l.conj().transpose()*b[:,:,j+1])*A_l+Q_l
     ref_traj_a = np.array([[ref_traj[0,j+1]],[ref_traj[1,j+1]]])
-    # stemp = np.matmul((A_l.conj().transpose() + k*B_l.conj().transpose()),stemp) - np.matmul(Q_l,ref_traj_a)
-    # stemp[0,j] = s[0,j]
-    # stemp[1,j] = s[1,j]
+    stemp = np.matmul((A_l.conj().transpose() + k(1:2,1:2)*B_l.conj().transpose()),stemp) - np.matmul(Q_l,ref_traj_a)
+    stemp[0,j] = stemp[0]
+    stemp[1,j] = stemp[1]
 
 first_step_angle = np.arctan((ref_traj[1,1] - ref_traj[1,0])/(ref_traj[0,1] - ref_traj[0,0]))
 init_angle = 0
